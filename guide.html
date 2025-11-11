@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Freelancer Auto Bid Assistant - Help</title>
+  <style>
+    /* Reset + Base */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #1e3a8a, #2563eb, #60a5fa);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 750px;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(20px);
+      border-radius: 20px;
+      padding: 40px 35px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+      color: #f8fafc;
+      animation: fadeIn 0.6s ease;
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(10px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+
+    h2 {
+      text-align: center;
+      font-size: 26px;
+      font-weight: 700;
+      margin-bottom: 30px;
+      color: #fff;
+      letter-spacing: 0.5px;
+    }
+
+    section {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 16px;
+      padding: 25px 20px;
+      margin-bottom: 25px;
+      box-shadow: 0 4px 12px rgba(255, 255, 255, 0.05);
+      transition: all 0.3s ease;
+    }
+
+    section:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+    }
+
+    h3 {
+      margin-bottom: 14px;
+      color: #e0f2fe;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      padding-bottom: 6px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+    }
+
+    p {
+      margin-bottom: 16px;
+      font-size: 15px;
+      color: #e2e8f0;
+    }
+
+    ul {
+      list-style-type: none;
+      padding-left: 20px;
+      margin-bottom: 20px;
+    }
+
+    li {
+      font-size: 14px;
+      margin-bottom: 8px;
+      color: #e2e8f0;
+    }
+
+    button {
+      display: block;
+      margin: 30px auto 0;
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: white;
+      border: none;
+      padding: 14px 34px;
+      border-radius: 12px;
+      font-size: 17px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(37, 99, 235, 0.45);
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Freelancer Auto Bid Assistant - Help</h2>
+
+    <section>
+      <h3>Introduction</h3>
+      <p>
+        The Freelancer Auto Bid Assistant helps you automate your bids on Freelancer
+        by collecting project data and generating personalized bid responses. With this extension,
+        you can manage your project list, update settings, and use AI-powered tools to craft perfect bids
+        with minimal effort.
+      </p>
+    </section>
+
+    <section>
+      <h3>How to Use</h3>
+      <h4>Step 1: Accessing the Popup</h4>
+      <p>
+        Click the extension icon in your browser toolbar to open the popup. The popup will display
+        a list of current projects along with options to filter and refresh the project list.
+      </p>
+
+      <h4>Step 2: Refreshing the Project List</h4>
+      <p>
+        To update the project list, simply click the refresh button. An animation will indicate that the
+        list is being updated, and the refreshed projects will be displayed once the update is complete.
+      </p>
+
+      <h4>Step 3: Viewing Projects</h4>
+      <p>
+        Each project is shown with its title, price, snippet, and summary. Click on a project to view more
+        details, and you can enable auto-bidding for it based on your settings.
+      </p>
+    </section>
+
+    <section>
+      <h3>Settings Overview</h3>
+      <h4>Profile Information</h4>
+      <p>
+        In the settings page, you can configure your personal details, including your name, title/role,
+        experience summary, and skills. These details will be used by the extension to personalize the bids.
+      </p>
+
+      <h4>App Preferences</h4>
+      <p>
+        In the "App Preferences" section, you can adjust the following:
+      </p>
+      <ul>
+        <li><strong>Fetch Interval:</strong> Set how often the extension will fetch new project data (in minutes).</li>
+        <li><strong>AI Integration Key:</strong> Enter your OpenAI API key to enable AI-powered bid generation.</li>
+        <li><strong>Auto-Fill Bids:</strong> Toggle this option to automatically fill bids based on your profile information.</li>
+        <li><strong>Notifications:</strong> Enable or disable notifications for new project updates.</li>
+        <li><strong>Notifications Auto-Disappear:</strong> Choose whether notifications should automatically disappear after a certain time.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h3>Troubleshooting</h3>
+      <h4>Extension Not Updating Projects</h4>
+      <p>
+        If you notice that the project list is not updating properly, try refreshing the page or adjusting your fetch interval settings.
+      </p>
+
+      <h4>AI Bidding Not Working</h4>
+      <p>
+        Ensure that your API key is correctly entered in the settings page. If the problem persists,
+        verify your API key with the service provider.
+      </p>
+    </section>
+    <h3 style="text-align:center">
+      © 2025 Developed by KSC
+    </h3>
+  </div>
+</body>
+</html>

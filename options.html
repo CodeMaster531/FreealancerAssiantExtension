@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Freelancer Assistant Settings</title>
+  <style>
+    /* Reset + Base */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #1e3a8a, #2563eb, #60a5fa);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 750px;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(20px);
+      border-radius: 20px;
+      padding: 40px 35px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+      color: #f8fafc;
+      animation: fadeIn 0.6s ease;
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(10px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+
+    h2 {
+      text-align: center;
+      font-size: 26px;
+      font-weight: 700;
+      margin-bottom: 30px;
+      color: #fff;
+      letter-spacing: 0.5px;
+    }
+
+    section {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 16px;
+      padding: 25px 20px;
+      margin-bottom: 25px;
+      box-shadow: 0 4px 12px rgba(255, 255, 255, 0.05);
+      transition: all 0.3s ease;
+    }
+
+    section:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+    }
+
+    h3 {
+      margin-bottom: 14px;
+      color: #e0f2fe;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      padding-bottom: 6px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+    }
+
+    label {
+      font-weight: 500;
+      display: block;
+      margin-top: 16px;
+      color: #e2e8f0;
+      font-size: 15px;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 10px 12px;
+      margin-top: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 10px;
+      font-size: 15px;
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: #cbd5e1;
+    }
+
+    input:focus, textarea:focus {
+      background: rgba(255, 255, 255, 0.25);
+      border-color: #93c5fd;
+    }
+
+    textarea {
+      resize: vertical;
+    }
+
+    .toggle {
+      display: flex;
+      align-items: center;
+      margin-top: 14px;
+      gap: 10px;
+      font-size: 15px;
+    }
+
+    .toggle label {
+      font-weight: 500;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 24px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: 0.4s;
+      border-radius: 34px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      border-radius: 50%;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: 0.4s;
+    }
+
+    input:checked + .slider {
+      background-color: #2563eb;
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+
+
+    button {
+      display: block;
+      margin: 30px auto 0;
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: white;
+      border: none;
+      padding: 14px 34px;
+      border-radius: 12px;
+      font-size: 17px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(37, 99, 235, 0.45);
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Freelancer Auto Bid Assistant Settings</h2>
+
+    <section>
+      <h3>Profile Information</h3>
+      <label>Name</label>
+      <input id="name" placeholder="Milos Markovic">
+
+      <label>Title / Role</label>
+      <input id="title" placeholder="Senior Full Stack Developer">
+
+      <label>Experience Summary</label>
+      <textarea id="summary" rows="9" placeholder="10+ years of experience in full stack web development..."></textarea>
+
+      <label>Skills</label>
+      <textarea id="skills" rows="3" placeholder="React, Node.js, PHP, Laravel, AWS, etc."></textarea>
+    </section>
+
+    <section>
+      <h3>App Preferences</h3>
+      <label>Fetch Interval (minutes)</label>
+      <input id="interval" type="number" min="1" placeholder="5">
+
+      <label>AI Integration Key</label>
+      <input id="apiKey" type="password" placeholder="Enter your OpenAI / API key">
+
+      <div class="toggle">
+        <label class="switch">
+          <input type="checkbox" id="autoFill">
+          <span class="slider"></span>
+        </label>
+        <label for="autoFill">Enable Auto-Fill Bids</label>
+      </div>
+
+      <div class="toggle">
+        <label class="switch">
+          <input type="checkbox" id="notifications">
+          <span class="slider"></span>
+        </label>
+        <label for="notifications">Enable Notifications</label>
+      </div>
+
+      <div class="toggle">
+        <label class="switch">
+          <input type="checkbox" id="notifications_show_mode">
+          <span class="slider"></span>
+        </label>
+        <label for="notifications_show_mode">Notifications Auto-Disappear</label>
+      </div>
+    </section>
+
+    <button id="save">Save All Settings</button>
+  </div>
+
+  <script src="options.js"></script>
+</body>
+</html>
