@@ -21,8 +21,8 @@
 
       body {
         font-family: "Inter", "Segoe UI", sans-serif;
-        width: 380px;
-        height: 550px;
+        width: 50vw;
+        height: 100vh;
         margin: 0;
         display: flex;
         flex-direction: column;
@@ -31,6 +31,7 @@
         transition: background 0.3s, color 0.3s;
         box-sizing: border-box;
         overflow: hidden;
+        margin:0 auto 0 auto;
       }
 
       body.dark {
@@ -57,8 +58,7 @@
 
       #themeToggle,
       #settingsBtn,
-      #guideBtn,
-      #zommPage {
+      #guideBtn {
         background: transparent;
         border: none;
         color: white;
@@ -69,8 +69,7 @@
 
       #themeToggle:hover,
       #settingsBtn:hover,
-      #guideBtn:hover,
-      #zommPage:hover {
+      #guideBtn:hover {
         opacity: 0.8;
       }
 
@@ -147,19 +146,19 @@
 
       .title {
         font-weight: 600;
-        font-size: 15px;
+        font-size: 20px;
         margin-bottom: 6px;
       }
 
       .price {
-        font-size: 13px;
+        font-size:16px;
         margin-bottom: 6px;
         color: var(--accent-light);
       }
 
       .snippet,
       .summary {
-        font-size: 12px;
+        font-size: 15px;
         color: #555;
         line-height: 1.5;
         margin-bottom: 6px;
@@ -219,12 +218,11 @@
   </head>
   <body>
     <header>
-      <i class="fa-solid fa-robot"></i>&nbsp;Auto Bid Assistant
+      <i class="fa-solid fa-robot" id="zoomPage"></i>&nbsp;Auto Bid Assistant
       <div>
         <button id="themeToggle"><i class="fa-solid fa-moon"></i></button>
         <button id="settingsBtn"><i class="fa-solid fa-gear"></i></button>
-        <button id="guideBtn"><i class="fa-solid fa-lightbulb"></i></button>
-        <button id="zommPage"><i class="fa-solid fa-search-plus"></i></button>
+        <button id="guideBtn"><i class="fa-solid fa-question"></i></button>
       </div>
     </header>
 
@@ -236,7 +234,7 @@
     </div>
     <div
       id="loadingSpinner"
-      style="display: none; text-align: center; padding: 20px; height: 500px"
+      style="display: none; text-align: center; padding: 20px; height:500px; "
     >
       <i
         class="fa-solid fa-spinner fa-spin"

@@ -1,14 +1,23 @@
 let lastProjectIds = [];
 let preferences = {
-  interval: 1,
-  apiKey:
-    "", // default empty, load from storage
+  interval: 30,
+  apiKey: "", // default empty, load from storage
   autoFill: false,
   notifications: false,
-  notification_show_mode: false,
+  notifications_show_mode: false,
+  bidTemplate: "",
+  gptModel: "gpt-3.5-turbo",
+  BidCondition: `Please write a winning bid that is attentive, flawless, courteous, engaging, and technical.
+Provide a winning bid that would make the client eager to hire me, ensuring all aspects are covered.\n\n`,
 };
 
-let bidTemplate = `Hello, I hope you're doing well.\n
+let profile = {
+  name: "",
+  title: "",
+  summary: "",
+};
+
+let TempBid = `Hello, I hope you're doing well.\n
 I believe I am the best candidate for this project because I bring combination of proven experience, technical expertise, and strong attention to detail.\n
 I have successfully completed similar projects in the past, which means I understand the challenges and how to solve them efficiently.\n
 My focus is always delivering high-quality result, meeting deadlines, and ensuring smooth communication throughout the project.\n
@@ -24,10 +33,10 @@ const notificationMap = {};
 // ---------------------------
 async function loadPreferences() {
   return new Promise((resolve) => {
-    chrome.storage.local.get(["preferences", "projects"], (data) => {
+    chrome.storage.local.get(["preferences", "profile", "projects"], (data) => {
       if (data.preferences) {
         preferences.interval = Math.max(
-          1,
+          30,
           data.preferences.interval ?? preferences.interval
         );
         preferences.autoFill =
@@ -35,31 +44,70 @@ async function loadPreferences() {
         preferences.apiKey = data.preferences.apiKey || preferences.apiKey;
         preferences.notifications =
           data.preferences.notifications ?? preferences.notifications;
-        preferences.notification_show_mode =
-          data.preferences.notification_show_mode ??
-          preferences.notification_show_mode;
+        preferences.notifications_show_mode =
+          data.preferences.notifications_show_mode ??
+          preferences.notifications_show_mode;
+        preferences.bidTemplate = data.preferences.bidTemplate ?? TempBid;
+        preferences.BidCondition =
+          data.preferences.BidCondition ?? preferences.BidCondition;
+        preferences.gptModel =
+          data.preferences.gptModel ?? preferences.gptModel;
+      }
+      if (data.profile) {
+        profile.name = data.profile.name ?? profile.name;
+        profile.title = data.profile.title ?? profile.title;
+        profile.summary = data.profile.summary ?? profile.summary;
       }
       if (data.projects) lastProjectIds = data.projects.map((p) => p.id);
       console.log(preferences);
+      console.log(profile);
       resolve();
     });
   });
 }
 
 // ---------------------------
-// Setup periodic fetch
+// Setup periodic fetch method 1 using chrome alarm
+// ---------------------------
+
+// function setupAlarm() {
+//   chrome.alarms.clear("checkProjects", () => {
+//     chrome.alarms.create("checkProjects", {
+//       periodInMinutes: preferences.interval,
+//     });
+//   });
+// }
+// ---------------------------
+// Setup periodic fetch method 2 using setinterval
 // ---------------------------
 function setupAlarm() {
-  chrome.alarms.clear("checkProjects", () => {
-    chrome.alarms.create("checkProjects", {
-      periodInMinutes: preferences.interval,
+  setInterval(() => {
+    console.log("Checking projects every 30 seconds");
+    fetchProjects();
+  }, preferences.interval * 1000); // 30000 ms = 30 seconds
+}
+//-------------------------------
+// Listen for a popup connection
+// Send a message to the popup
+//--------------------------------
+let connectedPorts = []; // Track the connections
+function sendMessageToPopup(message) {
+  return new Promise((resolve, reject) => {
+    chrome.runtime.sendMessage(message, (response) => {
+      console.log("Received response from popup:", response, message);
+      if (response == undefined || response.status == false || !response)
+        reject();
+      if (response.status == true) {
+        resolve();
+      }
     });
   });
 }
-
 // ---------------------------
 // Fetch projects from Freelancer
 // ---------------------------
+// This port for traffic from backend to popup
+//
 async function fetchProjects() {
   try {
     const res = await fetch(
@@ -89,26 +137,40 @@ async function fetchProjects() {
     if (newOnes.length > 0) {
       lastProjectIds = projectsWithUrl.map((p) => p.id);
       chrome.storage.local.set({ projects: projectsWithUrl });
+      // -------------------------------------------------------------
 
-      if (preferences.notifications) {
-        newOnes.forEach((p, i) => {
-          const notifId = String(p.id);
-          notificationMap[notifId] = p.url;
-          setTimeout(() => {
-            chrome.notifications.create(notifId, {
-              type: "basic",
-              iconUrl: "icon.png",
-              title: p.title,
-              message: `Budget: ${p.currency?.sign || "$"}${p.budget.minimum}-${
-                p.budget.maximum
-              } ${p.currency.code} [ ${p.type[0].toUpperCase()+p.type.slice(1)} ]
-              \nClick to view`,
-              priority: 2,
-              requireInteraction: preferences.notification_show_mode,
+      sendMessageToPopup({
+        action: "updatePopup",
+      })
+        .then(() => {
+          // display notification on desktop
+          if (preferences.notifications) {
+            newOnes.forEach((p, i) => {
+              const notifId = String(p.id);
+              notificationMap[notifId] = p.url;
+              setTimeout(() => {
+                chrome.notifications.create(notifId, {
+                  type: "basic",
+                  iconUrl: "icon.png",
+                  title: p.title,
+                  message: `Budget: ${p.currency?.sign || "$"}${
+                    p.budget.minimum
+                  }-${p.budget.maximum} ${p.currency.code} [ ${
+                    p.type[0].toUpperCase() + p.type.slice(1)
+                  } ]
+                    \nClick to view`,
+                  priority: 2,
+                  requireInteraction: preferences.notifications_show_mode,
+                });
+              }, i * 459);
             });
-          }, i * 500);
+          }
+        })
+        .catch(() => {
+          console.log("Not found new Projects");
         });
-      }
+
+      // --------------------------------------------------------------
     }
   } catch (err) {
     console.error("Fetch error:", err);
@@ -137,14 +199,11 @@ chrome.alarms.onAlarm.addListener((a) => {
 // Generate AI bid
 // ---------------------------
 async function generateAIBid(description) {
-  console.log('apikey:' + preferences.apiKey);
   if (!preferences.apiKey) {
     console.warn("apikey is missing");
-    return bidTemplate;
+    return preferences.bidTemplate ? preferences.bidTemplate : TempBid;
   }
-
   try {
-    console.log("Sending OpenAI request for bid...");
     const resp = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -152,7 +211,7 @@ async function generateAIBid(description) {
         Authorization: `Bearer ${preferences.apiKey}`,
       },
       body: JSON.stringify({
-        model: "gpt-3.5-turbo",
+        model: `${preferences.gptModel}`,
         messages: [
           {
             role: "system",
@@ -161,20 +220,31 @@ async function generateAIBid(description) {
           },
           {
             role: "user",
-            content: `Write a winning bid that’s attentive, perfect, kind, interested, and technical:\n\n${description}`,
+            content:
+              `This is project description :\n\n ${description}\n\n` +
+                profile.name &&
+              `Also, reference this:This is my name:${profile.name}\n\n` +
+                profile.title &&
+              `This is my title/role : \n\n ${profile.title}\n\n` +
+                profile.summary &&
+              `This is my summary:\n\n ${profile.summary}` +
+                `${preferences.BidCondition}\n\n `,
           },
         ],
-        max_tokens: 800,
+        max_tokens: 1500,
         temperature: 0.7,
       }),
     });
 
     const data = await resp.json();
     console.log(data);
-    return data?.choices?.[0]?.message?.content || bidTemplate;
+    return (
+      data?.choices?.[0]?.message?.content ||
+      (preferences.bidTemplate ? preferences.bidTemplate : TempBid)
+    );
   } catch (err) {
     console.error("AI generation error:", err);
-    return bidTemplate;
+    return preferences.bidTemplate ? preferences.bidTemplate : TempBid;
   }
 }
 
@@ -192,6 +262,9 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
       const bid = await generateAIBid(msg.description);
       sendResponse({ bid });
     }
+    if (msg.action === "reloadExtension") {
+      chrome.runtime.reload();
+    }
 
     if (msg.action === "openProject") {
       const { url } = msg;
@@ -199,44 +272,42 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         const listener = async (tabId, changeInfo) => {
           if (tabId === tab.id && changeInfo.status === "complete") {
             // Step 1: get full description from project page
-            const [{ result: fullDescription }] =
-              await chrome.scripting.executeScript({
-                target: { tabId: tab.id },
-                func: () => {
-                  function getProjectDescription() {
-                    const el = document.querySelector(
-                      "span.font-normal.text-foreground.text-xsmall.whitespace-pre-line"
-                    );
-                    return (
-                      el?.innerText?.trim() ||
-                      document.body.innerText.slice(0, 3000)
-                    );
-                  }
-                  return getProjectDescription();
-                },
-              });
-              console.log(fullDescription);
-            // Step 2: send full description to AI (generate bid)
-            const bidText =
-              (await generateAIBid(fullDescription)) ||
-              "Hello, I hope you're doing well...\n\nBest regards,\nMilos Markovic";
-
-            // Step 3: fill textarea
-            await chrome.scripting.executeScript({
-              target: { tabId: tab.id },
-              func: (bid) => {
-                const textarea = document.querySelector("#descriptionTextArea");
-                if (textarea) {
-                  textarea.value = bid;
-                  textarea.dispatchEvent(new Event("input", { bubbles: true }));
-                }
-              },
-              args: [bidText],
-            });
-
-            chrome.tabs.onUpdated.removeListener(listener);
+            // const [{ result: fullDescription }] =
+            //   await chrome.scripting.executeScript({
+            //     target: { tabId: tab.id },
+            //     func: () => {
+            //       function getProjectDescription() {
+            //         const el = document.querySelector(
+            //           "span.font-normal.text-foreground.text-xsmall.whitespace-pre-line"
+            //         );
+            //         return (
+            //           el?.innerText?.trim() ||
+            //           document.body.innerText.slice(0, 3000)
+            //         );
+            //       }
+            //       return getProjectDescription();
+            //     },
+            //   });
+            // console.log(fullDescription);
+            // // Step 2: send full description to AI (generate bid)
+            // const bidText =
+            //   (await generateAIBid(fullDescription)) ||
+            //   "Hello, I hope you're doing well...\n\nBest regards,\n[Your Name]";
+            // // Step 3: fill textarea
+            // await chrome.scripting.executeScript({
+            //   target: { tabId: tab.id },
+            //   func: (bid) => {
+            //     const textarea = document.querySelector("#descriptionTextArea");
+            //     if (textarea) {
+            //       textarea.value = bid;
+            //       textarea.dispatchEvent(new Event("input", { bubbles: true }));
+            //     }
+            //   },
+            //   args: [bidText],
+            // });
+            // chrome.tabs.onUpdated.removeListener(listener);
           }
-        }
+        };
 
         chrome.tabs.onUpdated.addListener(listener);
       });

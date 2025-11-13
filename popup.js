@@ -1,6 +1,5 @@
 let allProjects = [];
 let darkMode = false;
-
 // Helper: Send message to background
 function sendMessageAsync(msg) {
   return new Promise((resolve) => {
@@ -61,18 +60,9 @@ function renderProjects(projects) {
     `;
 
     // Click title → open project + auto-fill bid
-    div.querySelector(".title").addEventListener("click", () => {
+    div.addEventListener("click", () => {
       if (!p.url) return; // Ensure URL exists
       sendMessageAsync({ action: "openProject", url: p.url });
-    });
-
-    // Show project preview on hover
-    div.addEventListener("mouseenter", () => {
-      div.classList.add("show-preview");
-    });
-
-    div.addEventListener("mouseleave", () => {
-      div.classList.remove("show-preview");
     });
 
     container.appendChild(div);
@@ -101,10 +91,33 @@ document.getElementById("search").addEventListener("input", (e) => {
   renderProjects(filtered);
 });
 
+//Refresh projects function
+
+// Listen for messages from the background script
+chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+
+  if (msg.action === "updatePopup") { 
+    chrome.storage.local.get("projects", (data) => {
+      if (data.projects) {
+        allProjects = data.projects.map((p) => ({
+          ...p,
+          ai_summary: `AI Summary: ${p.title
+            .split(" ")
+            .slice(0, 5)
+            .join(" ")}...`,
+        }));
+        renderProjects(allProjects); // Re-render the projects with updated data
+      }
+    });
+    sendResponse({ status: true }); // Optional response back
+    // Update the popup UI with the received data
+  }
+});
+
+
 // Refresh projects
 document.getElementById("refresh").addEventListener("click", async () => {
-
-   document.getElementById("loadingSpinner").style.display = "block";
+  document.getElementById("loadingSpinner").style.display = "block";
 
   // Hide the projects list while refreshing
   document.getElementById("projects").style.display = "none";
@@ -119,8 +132,7 @@ document.getElementById("refresh").addEventListener("click", async () => {
           .slice(0, 5)
           .join(" ")}...`,
       }));
-      renderProjects(allProjects); // Re-render the projects with updated data
-
+      // renderProjects(allProjects); // Re-render the projects with updated data
       document.getElementById("loadingSpinner").style.display = "none";
       document.getElementById("projects").style.display = "block";
     }
@@ -143,4 +155,7 @@ document.getElementById("settingsBtn").addEventListener("click", () => {
 });
 document.getElementById("guideBtn").addEventListener("click", () => {
   window.open(chrome.runtime.getURL("guide.html"), "_blank");
+});
+document.getElementById("zommPage").addEventListener("click", () => {
+  window.open(chrome.runtime.getURL("zommPage.html"), "_blank");
 });
