@@ -95,11 +95,11 @@ function sendMessageToPopup(message) {
   return new Promise((resolve, reject) => {
     chrome.runtime.sendMessage(message, (response) => {
       console.log("Received response from popup:", response, message);
-      if (response == undefined || response.status == false || !response)
-        reject();
       if (response.status == true) {
         resolve();
       }
+      if (response == undefined || response.status == false || !response)
+        reject();
     });
   });
 }
@@ -143,6 +143,7 @@ async function fetchProjects() {
         action: "updatePopup",
       })
         .then(() => {
+          console.log('notification');
           // display notification on desktop
           if (preferences.notifications) {
             newOnes.forEach((p, i) => {
@@ -221,14 +222,16 @@ async function generateAIBid(description) {
           {
             role: "user",
             content:
-              `This is project description :\n\n ${description}\n\n` +
+              `This is project description.(main):\n\n ${description}\n\n` +
                 profile.name &&
               `Also, reference this:This is my name:${profile.name}\n\n` +
                 profile.title &&
               `This is my title/role : \n\n ${profile.title}\n\n` +
                 profile.summary &&
-              `This is my summary:\n\n ${profile.summary}` +
-                `${preferences.BidCondition}\n\n `,
+              `This is my summary(not essential):\n\n ${profile.summary}` +
+                `${preferences.BidCondition}\n\n
+                Characters must be no longer than 1500.
+              `,
           },
         ],
         max_tokens: 1500,

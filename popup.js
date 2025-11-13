@@ -57,10 +57,28 @@ function renderProjects(projects) {
       </div>
       <div class="snippet">${snippet}</div>
       <div class="summary"><i class="fa-solid fa-wand-magic-sparkles"></i> ${summary}</div>
-    `;
+      
+      <div class="url-pill" role="group" aria-label="Shareable link">
+      <div class="url-text" id="urlText" title="This is project url">
+        <span class="path">${p.url}
+      </div>
 
+      <button class="copy-btn"  aria-label="Copy link" title="Copy link">
+        <!-- simple clipboard SVG -->
+        <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+          <rect x="9" y="2" width="8" height="4" rx="1.2" stroke="#0f172a" stroke-width="1.2" fill="none"></rect>
+          <rect x="6.5" y="6" width="10.5" height="13" rx="2" stroke="#0f172a" stroke-width="1.2" fill="none"></rect>
+        </svg>
+        <span style="font-size:13px;color:#0f172a">Copy</span>
+      </button>
+      <div class="tooltip" id=${p.id} role="status" aria-live="polite">Copied!</div>
+    `;
+    // Click copy -> copy the url of project
+    div
+      .querySelector(".copy-btn")
+      .addEventListener("click", () => copyToClipboard(p.url,p.id));
     // Click title → open project + auto-fill bid
-    div.addEventListener("click", () => {
+    div.querySelector(".title").addEventListener("click", () => {
       if (!p.url) return; // Ensure URL exists
       sendMessageAsync({ action: "openProject", url: p.url });
     });
@@ -91,12 +109,9 @@ document.getElementById("search").addEventListener("input", (e) => {
   renderProjects(filtered);
 });
 
-//Refresh projects function
-
 // Listen for messages from the background script
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-
-  if (msg.action === "updatePopup") { 
+  if (msg.action === "updatePopup") {
     chrome.storage.local.get("projects", (data) => {
       if (data.projects) {
         allProjects = data.projects.map((p) => ({
@@ -113,7 +128,6 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     // Update the popup UI with the received data
   }
 });
-
 
 // Refresh projects
 document.getElementById("refresh").addEventListener("click", async () => {
@@ -159,3 +173,51 @@ document.getElementById("guideBtn").addEventListener("click", () => {
 document.getElementById("zommPage").addEventListener("click", () => {
   window.open(chrome.runtime.getURL("zommPage.html"), "_blank");
 });
+//Link copy function
+
+//Link Copy function
+// const tooltip = document.getElementById("tooltip");
+
+async function copyToClipboard(text,id) {
+  const tooltip = document.getElementById("tooltip");
+  try {
+    await navigator.clipboard.writeText(text);
+    showTooltip("Copied!",id);
+  } catch (err) {
+    fallbackCopyText(text);
+    showTooltip("Copied!",id);
+  }
+
+  function fallbackCopyText(value) {
+    const textarea = document.createElement("textarea");
+    textarea.value = value;
+    textarea.style.position = "absolute";
+    textarea.style.left = "-9999px";
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand("copy");
+    document.body.removeChild(textarea);
+  }
+
+  function showTooltip(message,id) {
+    const tooltip = document.getElementById(id);
+    tooltip.textContent = message;
+    tooltip.style.display = "inline";
+    setTimeout(() => (tooltip.style.display = "none"), 1500);
+  }
+}
+
+// function showTooltip(message) {
+//   tooltip.textContent = message;
+//   tooltip.style.display = "block";
+//   setTimeout(() => (tooltip.style.display = "none"), 1500);
+// }
+
+// // make URL selectable on click (optional nicety)
+// document.getElementById("urlText").addEventListener("click", () => {
+//   const range = document.createRange();
+//   range.selectNodeContents(document.getElementById("urlText"));
+//   const sel = window.getSelection();
+//   sel.removeAllRanges();
+//   sel.addRange(range);
+// });

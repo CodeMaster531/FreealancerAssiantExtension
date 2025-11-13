@@ -141,7 +141,7 @@
       }
 
       .project:hover {
-        transform: translateY(-5px);
+        transform: translateY(-1px);
         box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
       }
 
@@ -215,6 +215,84 @@
         border-radius: 10px;
         border: 3px solid #f1f1f1;
       }
+
+      
+    .url-pill{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      background:var(--pill);
+      padding:5px 12px;
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      border:1px solid rgba(0,0,0,0.04);
+      max-width:520px;
+      width:90%;
+    }
+
+    .url-text{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      font-size:14px;
+      color:#111827;
+      flex:1;
+    }
+
+    .url-text .protocol{
+      color:var(--muted);
+      margin-right:6px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", "Segoe UI Mono", monospace;
+      font-size:13px;
+    }
+
+    .url-text .path{
+      color:#0f172a;
+      font-weight:600;
+      font-size:14px;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .copy-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      background:var(--accent);
+      border-radius:12px;
+      padding:6px 8px;
+      border: none;
+      cursor:pointer;
+      user-select:none;
+      transition:background .12s, transform .06s;
+      font-size:13px;
+    }
+    .copy-btn:hover{ background:var(--accent-hover); transform:translateY(-1px); }
+    .copy-btn:active{ transform:translateY(0); }
+
+    /* icon size */
+    .icon { width:18px; height:18px; display:inline-block; }
+
+    .tooltip{
+      font-size:12px;
+      color:#f1f1f1;
+      padding:6px 8px;
+      border-radius:8px;
+      background:#000202;
+      border:1px solid rgba(22, 231, 57, 0.08);
+      margin-left:8px;
+      display:none;
+    }
+
+    /* small responsive tweak */
+    @media (max-width:420px){
+      .url-text .path{ font-size:13px; }
+    }
+
     </style>
   </head>
   <body>
